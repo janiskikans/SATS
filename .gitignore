@@ -1,2 +1,3 @@
 SATS_VENV/
 .vscode/
+__pycache__/
