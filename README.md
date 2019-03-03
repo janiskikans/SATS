@@ -1,2 +1,2 @@
 # SATS
-## Student Attendance Tracking System
+Student Attendance Tracking System
