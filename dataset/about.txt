@@ -1,0 +1,1 @@
+dataset contains student faces organized into subdirectories based on their respective names
