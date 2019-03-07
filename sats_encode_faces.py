@@ -23,7 +23,7 @@ knowIDS = []
 # Looping over all the found dataset images
 for (i, imagePath) in enumerate(imagePaths):
     # Getting student id's from the image path
-    print("[ENCODING] Processing image {}/{}".format(i + 1, len(imagePaths)))
+    print("[ENCODING] Processing image {}/{} with ID '{}'".format(i + 1, len(imagePaths), imagePath.split(os.path.sep)[-2]))
     student_id = imagePath.split(os.path.sep)[-2]
 
     # Load the input image and convert it from BGR color space to dlib ordering (RGB). Dlib expects RGB

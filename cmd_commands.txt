@@ -1,0 +1,2 @@
+python sats_recognize_faces_fImage.py --encodings encodings.pickle --detection-method hog --image test_images/got_john_den.jpg
+
