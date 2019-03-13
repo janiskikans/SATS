@@ -55,8 +55,9 @@ for records in student_id_list:
     print("[MYSQL]", str(records[0]))
 print('[MYSQL] Print finished')
 
-# For every student id get image refs and download images"
+# For every student id get image refs and download images
 for student_ids in student_id_list:
+    # Get all image references connected to selected student ID
     print("[MYSQL] Current student ID:", str(student_ids[0]))
     sql_query = """SELECT pb.ref_link FROM studenti s JOIN bildes_savienojumi bs on s.apliecibas_numurs = bs.apliecibas_numurs JOIN profila_bildes pb on pb.bildes_id = bs.bildes_id WHERE s.apliecibas_numurs='%s'""" % (student_ids[0],)
     mycursor.execute(sql_query)
@@ -77,3 +78,5 @@ for student_ids in student_id_list:
         print('[MYSQL] No images found for selected student id!')
 
     print("[MYSQL] Success! Image refrences retrieved")
+
+    # Retrieve each image from ftp server
