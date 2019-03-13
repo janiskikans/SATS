@@ -79,4 +79,4 @@ for student_ids in student_id_list:
 
     print("[MYSQL] Success! Image refrences retrieved")
 
-    # Retrieve each image from ftp server
+    # Retrieve each image from FTP server
