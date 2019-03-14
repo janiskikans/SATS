@@ -2,6 +2,8 @@ from configparser import ConfigParser
 import ftplib
 import os
 import mysql.connector
+# Other scripts
+from sats_encode_faces import encode_faces
 
 parser = ConfigParser()
 parser.read('./config/dev_settings_local.ini')
@@ -22,7 +24,7 @@ def ftp_connect(img_ref_list, student_sel):
                 ftp.login(ftp_account, ftp_password)
                 #print(ftp.getwelcome())
                 #print("[FTP] Current directory", ftp.pwd())
-                ftp.dir()
+                #ftp.dir()
                 ftp_get_images(ftp, img_ref_list, student_sel)
                 break
         except ftplib.all_errors as e:
@@ -34,7 +36,7 @@ def ftp_get_images(ftp, img_ref_list, student_sel):
     ftp.cwd("/bildes/studentu_bildes/%s" %str(student_sel))
     #print("[FTP] Current path:", ftp.pwd())
 
-    os.chdir('retr_files')
+    os.chdir('dataset')
 
     if not os.path.exists(student_sel):
         os.mkdir(student_sel)
@@ -116,7 +118,9 @@ while choice not in ("y", "n", "yes", "no"):
     choice = input("[INPUT] Do you want to encode retrieved faces? (y/n): ")
     if choice == "y" or choice == "yes":
         # Run encode faces script with parameters
+        encode_faces()
     elif choice == "n" or choice == "no":
+        print("[INFO] Retrieval scripts finished! Exiting..")
         break
     else:
         print("[ERROR] Invalid input! Enter y or n.")
