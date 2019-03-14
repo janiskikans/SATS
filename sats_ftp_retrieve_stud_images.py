@@ -108,4 +108,15 @@ for student_ids in student_id_list:
 
     retr_students += 1
 
-print("\n[INFO] Script finished! Retrieved images of {} students ({} images total)!.".format(retr_students, retr_images))
+print("\n[INFO] Image retrieval finished! Retrieved images of {} students ({} images total)!.".format(retr_students, retr_images))
+
+# Check if also encode retrieved student images
+choice = None
+while choice not in ("y", "n", "yes", "no"):
+    choice = input("[INPUT] Do you want to encode retrieved faces? (y/n): ")
+    if choice == "y" or choice == "yes":
+        # Run encode faces script with parameters
+    elif choice == "n" or choice == "no":
+        break
+    else:
+        print("[ERROR] Invalid input! Enter y or n.")
