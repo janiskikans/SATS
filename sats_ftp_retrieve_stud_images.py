@@ -120,7 +120,7 @@ while choice not in ("y", "n", "yes", "no"):
         # Run encode faces script with parameters
         encode_faces()
     elif choice == "n" or choice == "no":
-        print("[INFO] Retrieval scripts finished! Exiting..")
+        print("[INFO] Retrieval scripts finished! Done.")
         break
     else:
         print("[ERROR] Invalid input! Enter y or n.")
