@@ -5,6 +5,7 @@ import imutils
 import pickle
 import time
 import cv2
+import time
 
 # Arg parsing
 arg_parser = argparse.ArgumentParser()
@@ -25,7 +26,6 @@ time.sleep(2.0)
 
 while True:
     frame = vs.read()
-
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     rgb = imutils.resize(frame, width = 450)
     r = frame.shape[1] / float(rgb.shape[1])

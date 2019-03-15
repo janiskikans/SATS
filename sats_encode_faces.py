@@ -12,7 +12,7 @@ arg_parser.add_argument("-e", "--encodings", required = True, default = "encodin
 arg_parser.add_argument("-d", "--detection-method", type = str, default = "cnn", help = "Desired face detecton model (hog/cnn)")
 args = vars(arg_parser.parse_args()) """
 
-def encode_faces(dataset_dir = "dataset", encodings_file = "encodings.pickle", detection_method = "cnn"):
+def encode_faces(dataset_dir = "dataset", encodings_file = "encodings.pickle", detection_method = "hog"):
     # Grab the paths to data set input images
     print("\n[ENCODING] Quantifying dataset images...")
     imagePaths = list(paths.list_images(dataset_dir)) # Makes a list of all imagePaths contained in data set directory
