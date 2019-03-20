@@ -9,14 +9,21 @@ import pickle
 import time
 import cv2
 
-# Globals (kad izmanto tad prefix global)
-reg_student_list = [] # Registered student id list. Empties before every new class.
-
 # Config file import
 parser = ConfigParser()
 parser.read('./config/dev_settings_local.ini')
 
-def register_student(student_id, auditorium):
+# Current lesson vars
+lesson_id = "Null"
+lessson_course_number = "Null"
+lesson_auditorium = "Null"
+lesson_date = "Null"
+lesson_start_time = "Null"
+lesson_end_time = "Null"
+lesson_status = False
+reg_student_list = [] # Registered student id list. Empties before every new class.
+
+def register_student(student_id, auditorium, lesson_id):
     # MySQL connection details
     mydb = mysql.connector.connect(
         host = parser.get('db', 'db_host'),
@@ -27,93 +34,105 @@ def register_student(student_id, auditorium):
 
     mycursor = mydb.cursor()
 
-    sql_query = """INSERT INTO studentu_uzskaite (apliecibas_numurs, registracijas_laiks, telpas_numurs)
-    VALUES (%s, %s, %s)"""
+    sql_query = """INSERT INTO studentu_uzskaite (apliecibas_numurs, registracijas_laiks, telpas_numurs, nodarbibas_id)
+    VALUES (%s, %s, %s, %s)"""
     current_time_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print("[REGISTRATION] Registration time:", current_time_date)
-    values = ('000CCC000', current_time_date, auditorium) #2019-03-19 12:57:00
+    values = (student_id, current_time_date, auditorium, lesson_id) #2019-03-19 12:57:00
 
     mycursor.execute(sql_query, values)
     mydb.commit()
+    mydb.close()
     print("[REGISTRATION]", mycursor.rowcount, "record inserted!")
 
-def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_method = "hog", output = "", auditorium = "Not specified"):
-    print("\n[RECOGNITION] Loading encodings...")
+def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_method = "hog", output = "", auditorium = "Not specified", webcam_select = 0):
+    print("\n[INFO] Loading encodings...")
 
     # Loading the known faces and encodings from pickle dump
     data = pickle.loads(open(encodings_file, "rb").read())
 
-    print("[RECOGNITION] Starting video stream...")
-    vs = VideoStream(src = 0).start()
+    print("[INFO] Starting video stream...")
+    vs = VideoStream(src = webcam_select).start()
     writer = None
     time.sleep(2.0)
 
     try:
         while True:
-            frame = vs.read()
-            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            rgb = imutils.resize(frame, width = 450)
-            r = frame.shape[1] / float(rgb.shape[1]) # Rescale
+            print("[INFO] Checking lesson...")
+            check_lesson(auditorium = auditorium)
+            if lesson_status is True:
+                print("[INFO] Current lesson: %s (Kursa numurs: %s, Telpa: %s, Datums: %s, Sakuma laiks: %s, beigu_laiks: %s" % (lesson_id, lessson_course_number, lesson_auditorium, lesson_date, lesson_start_time, lesson_end_time))
 
-            boxes = face_recognition.face_locations(rgb, model = detection_method)
-            encodings = face_recognition.face_encodings(rgb, boxes)
-
-            names = []
-            
-            for encoding in encodings:
-                matches = face_recognition.compare_faces(data["encodings"], encoding)
-                name = "Unknown"
-
-                if True in matches:
-                    matchedIdxs = [i for (i, b) in enumerate(matches) if b]
-                    counts = {}
-
-                    # Loop over the matched indexes and maintain a count for each recognized face
-                    for i in matchedIdxs:
-                        name = data["ids"][i]
-                        counts[name] = counts.get(name, 0) + 1
+            while lesson_status == True:
+                check_lesson(auditorium = auditorium)
                 
-                    # Determine the recognized face with the largest number of votes (note: in the event of unlikely tie Python will select firt entry in the dictionary)
-                    name = max(counts, key=counts.get)
-            
-                # Update the list of student ids
-                names.append(name)
-                print("[RECOGNITION] Recognized ID:", name)
+                frame = vs.read()
+                rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                rgb = imutils.resize(frame, width = 450)
+                r = frame.shape[1] / float(rgb.shape[1]) # Rescale
 
-                if name not in reg_student_list and name != "Unknown":
-                    reg_student_list.append(name)
-                    register_student(name, auditorium)
-                elif name in reg_student_list:
-                    print("[RECOGNITION] Student already in list!")
-                else:
-                    print("[RECOGNITION] Not recognized!")
+                boxes = face_recognition.face_locations(rgb, model = detection_method)
+                encodings = face_recognition.face_encodings(rgb, boxes)
 
-            # Loop over the recognized faces
-            for ((top, right, bottom, left), name) in zip(boxes, names):
-                # rescale the face coordinates
-                top = int(top * r)
-                right = int(right * r)
-                bottom = int(bottom * r)
-                left = int(left * r)
+                names = []
+                
+                for encoding in encodings:
+                    matches = face_recognition.compare_faces(data["encodings"], encoding)
+                    name = "Unknown"
 
-                # Draw the predicted face name on the image
-                cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
-                y = top - 15 if top - 15 > 15 else top + 15
-                cv2.putText(frame, "ID:" + name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+                    if True in matches:
+                        matchedIdxs = [i for (i, b) in enumerate(matches) if b]
+                        counts = {}
 
-            if writer is None and output is not None:
-                fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-                writer = cv2.VideoWriter(output, fourcc, 20, (frame.shape[1], frame.shape[0]), True)
+                        # Loop over the matched indexes and maintain a count for each recognized face
+                        for i in matchedIdxs:
+                            name = data["ids"][i]
+                            counts[name] = counts.get(name, 0) + 1
+                    
+                        # Determine the recognized face with the largest number of votes (note: in the event of unlikely tie Python will select firt entry in the dictionary)
+                        name = max(counts, key=counts.get)
+                
+                    # Update the list of student ids
+                    names.append(name)
+                    print("[RECOGNITION] Recognized ID:", name)
 
-            if writer is not None:
-                writer.write(frame)
+                    if name not in reg_student_list and name != "Unknown":
+                        reg_student_list.append(name)
+                        register_student(name, auditorium, lesson_id)
+                    elif name in reg_student_list:
+                        print("[RECOGNITION] Student already in list!")
+                    else:
+                        print("[RECOGNITION] Not recognized!")
 
-            if display > 0:
-                cv2.imshow("Frame", frame)
-                key = cv2.waitKey(1) & 0xFF
+                # Loop over the recognized faces
+                for ((top, right, bottom, left), name) in zip(boxes, names):
+                    # rescale the face coordinates
+                    top = int(top * r)
+                    right = int(right * r)
+                    bottom = int(bottom * r)
+                    left = int(left * r)
 
-                if key == ord("q"):
-                    break
+                    # Draw the predicted face name on the image
+                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+                    y = top - 15 if top - 15 > 15 else top + 15
+                    cv2.putText(frame, "ID:" + name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+
+                if writer is None and output is not None:
+                    fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+                    writer = cv2.VideoWriter(output, fourcc, 20, (frame.shape[1], frame.shape[0]), True)
+
+                if writer is not None:
+                    writer.write(frame)
+
+                if display > 0:
+                    cv2.imshow("Frame", frame)
+                    key = cv2.waitKey(1) & 0xFF
+
+                    if key == ord("q"):
+                        break
+
+            time.sleep(10)
+
     except KeyboardInterrupt:
         pass
 
@@ -123,6 +142,52 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
     if writer is not None:
         writer.release()
 
+def check_lesson(auditorium): # Checks what lesson is happening in selected auditorium at the time
+    global lesson_id
+    global lessson_course_number
+    global lesson_auditorium
+    global lesson_date
+    global lesson_start_time
+    global lesson_end_time
+    global lesson_status
+    
+    # MySQL connection details
+    mydb = mysql.connector.connect(
+        host = parser.get('db', 'db_host'),
+        user = parser.get('db', 'db_user'),
+        passwd = parser.get('db', 'db_passwd'),
+        database = parser.get('db', 'db_database')
+    )
+
+    lesson_check_cursor = mydb.cursor()
+    sql_query = "SELECT nodarbibas_id, kursa_numurs, telpa, datums, sakuma_laiks, beigu_laiks FROM bakalaurs.nodarbibas WHERE datums = %s AND %s BETWEEN SUBTIME(sakuma_laiks, '0:10:0.000000') AND beigu_laiks AND telpa = %s"
+    current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    current_time = datetime.datetime.now().strftime("%H:%M:%S")
+    #print("[TEST] Current time and date, auditorium:", str(current_date), str(current_time), auditorium)
+    values = (current_date, current_time, auditorium)
+
+    lesson_check_cursor.execute(sql_query, values)
+    myresult = lesson_check_cursor.fetchall()
+    #print("[TEST] Last query:", lesson_check_cursor.statement)
+    #print('[MYSQL] Lessons found:', lesson_check_cursor.rowcount)
+
+    if lesson_check_cursor.rowcount > 0:
+        lesson_status = True
+        for row in myresult:
+            #print(row[0], row[1], row[2], row[3], row[4], row[5]) 
+            lesson_id = row[0]
+            lessson_course_number = row[1]
+            lesson_auditorium = row[2]
+            lesson_date = row[3]
+            lesson_start_time = row[4]
+            lesson_end_time = row[5]
+    else:
+        lesson_status = False
+        print("[INFO] No lesson found! Not checking attendance.")
+
+    mydb.close()
+
 if __name__ == "__main__":
     recognition_cam()
     register_student()
+    check_lesson()
