@@ -17,7 +17,20 @@ while loop:
         print("Starting script...\n")
         auditorium_input = input("[INPUT] Enter auditorium number:")
         auditorium_input = str(auditorium_input)
-        recognition_cam(encodings_file = "encodings.pickle", display = 0, detection_method = "hog", auditorium = auditorium_input)
+        
+        while True:
+            try:
+                webcam_input = int(input("\nSelect input webcam (In-built webcam - 0; External webcam - 1):"))
+                break
+            except:
+                print("Invalid input")
+                
+            if (webcam_input == 0) or (webcam_input == 1):
+                continue
+            else:
+                print("[ERROR] Invalid webcam selection!")
+
+        recognition_cam(encodings_file = "encodings.pickle", display = 0, detection_method = "hog", auditorium = auditorium_input, webcam_select = webcam_input)
         break
     elif choice == 3:
         loop = False
