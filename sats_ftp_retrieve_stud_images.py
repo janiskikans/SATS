@@ -53,74 +53,82 @@ def ftp_get_images(ftp, img_ref_list, student_sel):
 
     os.chdir("../..") # Returns to main directory after downloading student images
 
-# MySQL connection details
-mydb = mysql.connector.connect(
-    host = parser.get('db', 'db_host'),
-    user = parser.get('db', 'db_user'),
-    passwd = parser.get('db', 'db_passwd'),
-    database = parser.get('db', 'db_database')
-)
+def ftp_retrieve_stud_images_main():
+    global ftp_address, ftp_account, ftp_password
 
-mycursor = mydb.cursor()
+    print("[INFO] FTP connection details:", "Address: ", ftp_address, "| Account:", ftp_account, "| Password:", ftp_password)
+    # MySQL connection details
+    mydb = mysql.connector.connect(
+        host = parser.get('db', 'db_host'),
+        user = parser.get('db', 'db_user'),
+        passwd = parser.get('db', 'db_passwd'),
+        database = parser.get('db', 'db_database')
+    )
 
-# Get all student ids in database
-sql_query = """SELECT studenti.apliecibas_numurs FROM bakalaurs.studenti"""
-mycursor.execute(sql_query)
-myresult = mycursor.fetchall()
+    mycursor = mydb.cursor()
 
-print('[MYSQL] Record count:', mycursor.rowcount)
-print('[MYSQL] student_id_list values:')
-print('[MYSQL] Printing values...')
-
-student_id_list = [list(i) for i in myresult]
-for records in student_id_list:
-    print("[MYSQL]", str(records[0]))
-print('[MYSQL] Print finished')
-
-print("-" * 30)
-print("[INFO] Getting student images!")
-
-retr_students = 0 # Counts how many student id images downloaded
-# For every student id get image refs and download images
-for student_ids in student_id_list:
-    # Get all image references connected to selected student ID
-    print("\n[MYSQL] Current student ID:", str(student_ids[0]))
-    sql_query = """SELECT pb.ref_link FROM studenti s JOIN bildes_savienojumi bs on s.apliecibas_numurs = bs.apliecibas_numurs JOIN profila_bildes pb on pb.bildes_id = bs.bildes_id WHERE s.apliecibas_numurs='%s'""" % (student_ids[0],)
+    # Get all student ids in database
+    sql_query = """SELECT studenti.apliecibas_numurs FROM bakalaurs.studenti"""
     mycursor.execute(sql_query)
     myresult = mycursor.fetchall()
-    
-    img_ref_list = [list(i) for i in myresult]
 
-    if mycursor.rowcount != 0:
-        print('[MYSQL] Record count:', mycursor.rowcount)
-        print('[MYSQL] Printing values...')
-        print('[MYSQL] img_ref_list values:')
+    print('[MYSQL] Record count:', mycursor.rowcount)
+    print('[MYSQL] student_id_list values:')
+    print('[MYSQL] Printing values...')
 
-        for records in img_ref_list:
-            print("[MYSQL]", str(records[0]))
+    student_id_list = [list(i) for i in myresult]
+    for records in student_id_list:
+        print("[MYSQL]", str(records[0]))
+    print('[MYSQL] Print finished')
 
-        print('[MYSQL] Print finished')
-    else:
-        print('[MYSQL] No images found for selected student id!')
+    print("-" * 30)
+    print("[INFO] Getting student images!")
 
-    print("[MYSQL] Success! Image references retrieved")
+    retr_students = 0 # Counts how many student id images downloaded
+    # For every student id get image refs and download images
+    for student_ids in student_id_list:
+        # Get all image references connected to selected student ID
+        print("\n[MYSQL] Current student ID:", str(student_ids[0]))
+        sql_query = """SELECT pb.ref_link FROM studenti s JOIN bildes_savienojumi bs on s.apliecibas_numurs = bs.apliecibas_numurs JOIN profila_bildes pb on pb.bildes_id = bs.bildes_id WHERE s.apliecibas_numurs='%s'""" % (student_ids[0],)
+        mycursor.execute(sql_query)
+        myresult = mycursor.fetchall()
+        
+        img_ref_list = [list(i) for i in myresult]
 
-    # Retrieve each image from FTP server from specified student
-    ftp_connect(img_ref_list, str(student_ids[0]))
+        if mycursor.rowcount != 0:
+            print('[MYSQL] Record count:', mycursor.rowcount)
+            print('[MYSQL] Printing values...')
+            print('[MYSQL] img_ref_list values:')
 
-    retr_students += 1
+            for records in img_ref_list:
+                print("[MYSQL]", str(records[0]))
 
-print("\n[INFO] Image retrieval finished! Retrieved images of {} students ({} images total)!.".format(retr_students, retr_images))
+            print('[MYSQL] Print finished')
+        else:
+            print('[MYSQL] No images found for selected student id!')
 
-# Check if also encode retrieved student images
-choice = None
-while choice not in ("y", "n", "yes", "no"):
-    choice = input("[INPUT] Do you want to encode retrieved faces? (y/n): ")
-    if choice == "y" or choice == "yes":
-        # Run encode faces script with parameters
-        encode_faces()
-    elif choice == "n" or choice == "no":
-        print("[INFO] Retrieval scripts finished! Done.")
-        break
-    else:
-        print("[ERROR] Invalid input! Enter y or n.")
+        print("[MYSQL] Success! Image references retrieved")
+
+        # Retrieve each image from FTP server from specified student
+        ftp_connect(img_ref_list, str(student_ids[0]))
+
+        retr_students += 1
+
+    print("\n[INFO] Image retrieval finished! Retrieved images of {} students ({} images total)!.".format(retr_students, retr_images))
+
+    # Check if also encode retrieved student images
+    choice = None
+    while choice not in ("y", "n", "yes", "no"):
+        choice = input("[INPUT] Do you want to encode retrieved faces? (y/n): ")
+        if choice == "y" or choice == "yes":
+            # Run encode faces script with parameters
+            encode_faces()
+        elif choice == "n" or choice == "no":
+            print("[INFO] Retrieval scripts finished! Done.")
+            break
+        else:
+            print("[ERROR] Invalid input! Enter y or n.")
+
+if __name__ == "__main__":
+    ftp_get_images()
+    ftp_connect()
