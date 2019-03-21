@@ -8,6 +8,9 @@ import imutils
 import pickle
 import time
 import cv2
+from pympler.tracker import SummaryTracker
+
+tracker = SummaryTracker()
 
 # Config file import
 parser = ConfigParser()
@@ -20,6 +23,8 @@ lesson_auditorium = "Null"
 lesson_date = "Null"
 lesson_start_time = "Null"
 lesson_end_time = "Null"
+lesson_teacher_name = "Null"
+lesson_teacher_surname = "Null"
 lesson_status = False
 reg_student_list = [] # Registered student id list. Empties before every new class.
 
@@ -61,7 +66,7 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
             print("[INFO] Checking lesson...")
             check_lesson(auditorium = auditorium)
             if lesson_status is True:
-                print("[INFO] Current lesson: %s (Kursa numurs: %s, Telpa: %s, Datums: %s, Sakuma laiks: %s, beigu_laiks: %s" % (lesson_id, lessson_course_number, lesson_auditorium, lesson_date, lesson_start_time, lesson_end_time))
+                print("[INFO] Current lesson: %s (Kursa numurs: %s): \nTelpa: %s\nDatums: %s\nSakuma laiks: %s\nBeigu laiks: %s\nPasn. vārds: %s\nuPasn. uzvārds: %s" % (lesson_id, lessson_course_number, lesson_auditorium, lesson_date, lesson_start_time, lesson_end_time, lesson_teacher_name, lesson_teacher_surname))
 
             while lesson_status == True:
                 check_lesson(auditorium = auditorium)
@@ -134,13 +139,15 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
             time.sleep(10)
 
     except KeyboardInterrupt:
+        tracker.print_diff()
+        vs.stop()
         pass
 
     cv2.destroyAllWindows()
-    vs.Stop()
 
     if writer is not None:
         writer.release()
+
 
 def check_lesson(auditorium): # Checks what lesson is happening in selected auditorium at the time
     global lesson_id
@@ -150,6 +157,8 @@ def check_lesson(auditorium): # Checks what lesson is happening in selected audi
     global lesson_start_time
     global lesson_end_time
     global lesson_status
+    global lesson_teacher_name
+    global lesson_teacher_surname
     
     # MySQL connection details
     mydb = mysql.connector.connect(
@@ -160,7 +169,8 @@ def check_lesson(auditorium): # Checks what lesson is happening in selected audi
     )
 
     lesson_check_cursor = mydb.cursor()
-    sql_query = "SELECT nodarbibas_id, kursa_numurs, telpa, datums, sakuma_laiks, beigu_laiks FROM bakalaurs.nodarbibas WHERE datums = %s AND %s BETWEEN SUBTIME(sakuma_laiks, '0:10:0.000000') AND beigu_laiks AND telpa = %s"
+    #sql_query = "SELECT nodarbibas_id, kursa_numurs, telpa, datums, sakuma_laiks, beigu_laiks FROM bakalaurs.nodarbibas WHERE datums = %s AND %s BETWEEN SUBTIME(sakuma_laiks, '0:10:0.000000') AND beigu_laiks AND telpa = %s"
+    sql_query = "SELECT n.nodarbibas_id, n.kursa_numurs, n.telpa, n.datums, n.sakuma_laiks, n.beigu_laiks, p.pasniedzeja_vards, p.pasniedzeja_uzvards FROM macisanas_saraksts AS m INNER JOIN nodarbibas AS n ON m.nodarbibas_id = n.nodarbibas_id INNER JOIN pasniedzeji AS p ON m.pasniedzeja_id = p.pasniedzeja_id WHERE n.datums = %s AND %s BETWEEN SUBTIME(n.sakuma_laiks, '0:10:0.000000') AND n.beigu_laiks AND n.telpa = %s"
     current_date = datetime.datetime.now().strftime("%Y-%m-%d")
     current_time = datetime.datetime.now().strftime("%H:%M:%S")
     #print("[TEST] Current time and date, auditorium:", str(current_date), str(current_time), auditorium)
@@ -181,13 +191,44 @@ def check_lesson(auditorium): # Checks what lesson is happening in selected audi
             lesson_date = row[3]
             lesson_start_time = row[4]
             lesson_end_time = row[5]
+            lesson_teacher_name = row[6]
+            lesson_teacher_surname = row[7]
     else:
         lesson_status = False
-        print("[INFO] No lesson found! Not checking attendance.")
+        clear_current_class_vars()
+        print("[INFO] No current lesson found! Not checking attendance...")
 
     mydb.close()
+
+def clear_current_class_vars():
+    global lesson_id
+    global lessson_course_number
+    global lesson_auditorium
+    global lesson_date
+    global lesson_start_time
+    global lesson_end_time
+    global lesson_status
+    global lesson_teacher_name
+    global lesson_teacher_surname
+    global reg_student_list
+
+    reg_student_list.clear()
+    lesson_id = "Null"
+    lessson_course_number = "Null"
+    lesson_auditorium = "Null"
+    lesson_date = "Null"
+    lesson_start_time = "Null"
+    lesson_end_time = "Null"
+    lesson_teacher_name = "Null"
+    lesson_teacher_surname = "Null"
+
+def print_list(input_list):
+    for items in input_list:
+        print(items, sep='\n')
 
 if __name__ == "__main__":
     recognition_cam()
     register_student()
     check_lesson()
+    print_list()
+    clear_current_class_vars()
