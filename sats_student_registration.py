@@ -11,6 +11,7 @@ import cv2
 from pympler.tracker import SummaryTracker
 
 tracker = SummaryTracker()
+sleep_time = 10
 
 # Config file import
 parser = ConfigParser()
@@ -63,7 +64,7 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
 
     try:
         while True:
-            print("[INFO] Checking lesson...")
+            print("\n[INFO] Checking lesson...")
             check_lesson(auditorium = auditorium)
             if lesson_status is True:
                 print("[INFO] Current lesson: %s (Kursa numurs: %s): \nTelpa: %s\nDatums: %s\nSakuma laiks: %s\nBeigu laiks: %s\nPasn. vārds: %s\nuPasn. uzvārds: %s" % (lesson_id, lessson_course_number, lesson_auditorium, lesson_date, lesson_start_time, lesson_end_time, lesson_teacher_name, lesson_teacher_surname))
@@ -99,7 +100,7 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
                 
                     # Update the list of student ids
                     names.append(name)
-                    print("[RECOGNITION] Recognized ID:", name)
+                    print("\n[RECOGNITION] Recognized ID:", name)
 
                     if name not in reg_student_list and name != "Unknown":
                         reg_student_list.append(name)
@@ -136,7 +137,7 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
                     if key == ord("q"):
                         break
 
-            time.sleep(10)
+            time.sleep(sleep_time)
 
     except KeyboardInterrupt:
         tracker.print_diff()
@@ -196,7 +197,7 @@ def check_lesson(auditorium): # Checks what lesson is happening in selected audi
     else:
         lesson_status = False
         clear_current_class_vars()
-        print("[INFO] No current lesson found! Not checking attendance...")
+        print("[INFO] No current lesson found! Not checking attendance. Sleeping for %s seconds..." %(int(sleep_time)))
 
     mydb.close()
 
