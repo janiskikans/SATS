@@ -68,7 +68,7 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
             print("\n[INFO] Checking lesson...")
             check_lesson(auditorium = auditorium)
             if lesson_status is True:
-                print("[INFO] Current lesson: %s (Kursa numurs: %s): \nTelpa: %s\nDatums: %s\nSakuma laiks: %s\nBeigu laiks: %s\nPasn. vārds: %s\nuPasn. uzvārds: %s" % (lesson_id, lessson_course_number, lesson_auditorium, lesson_date, lesson_start_time, lesson_end_time, lesson_teacher_name, lesson_teacher_surname))
+                print("[INFO] Current lesson: %s (Kursa numurs: %s): \nTelpa: %s\nDatums: %s\nSakuma laiks: %s\nBeigu laiks: %s\nPasn. vārds: %s\nPasn. uzvārds: %s" % (lesson_id, lessson_course_number, lesson_auditorium, lesson_date, lesson_start_time, lesson_end_time, lesson_teacher_name, lesson_teacher_surname))
 
             while lesson_status == True:
                 check_lesson(auditorium = auditorium)
@@ -137,6 +137,8 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
 
                     if key == ord("q"):
                         break
+
+                time.sleep(1)
 
             time.sleep(sleep_time)
 
