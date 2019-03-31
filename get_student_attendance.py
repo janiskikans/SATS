@@ -4,7 +4,8 @@ import datetime
 
 # Config parser
 parser = ConfigParser()
-parser.read('config/dev_settings_local.ini')
+#parser.read('config/dev_settings_local.ini') # local
+parser.read('./config/dev_settings.ini') # remote LAN
 
 # Gets all info from studentu_uzskaite table
 def get_all_attendance_data():

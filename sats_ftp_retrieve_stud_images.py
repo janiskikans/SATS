@@ -6,7 +6,8 @@ import mysql.connector
 from sats_encode_faces import encode_faces
 
 parser = ConfigParser()
-parser.read('./config/dev_settings_local.ini')
+#parser.read('./config/dev_settings_local.ini') # local
+parser.read('./config/dev_settings.ini') # remote LAN
 
 # Global vars
 ftp_address = parser.get('ftp', 'ftp_address')

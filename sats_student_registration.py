@@ -15,7 +15,8 @@ sleep_time = 10
 
 # Config file import
 parser = ConfigParser()
-parser.read('./config/dev_settings_local.ini')
+#parser.read('./config/dev_settings_local.ini') # local
+parser.read('./config/dev_settings.ini') # remote LAN
 
 # Current lesson vars
 lesson_id = "Null"
