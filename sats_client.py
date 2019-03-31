@@ -4,6 +4,7 @@ import sats_client_functions
 from sats_student_registration import recognition_cam
 from get_student_attendance import get_all_attendance_data, get_attendance_by_lesson_id
 from sats_ftp_retrieve_stud_images import ftp_retrieve_stud_images_main
+import sats_manual_attendance
 
 print("\nSATS Main Client By Janis Kikans", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), sep=" | ")
 
@@ -36,8 +37,11 @@ while loop:
         recognition_cam(encodings_file = "encodings.pickle", display = 0, detection_method = "hog", auditorium = auditorium_input, webcam_select = webcam_input)
     elif choice == 3:
         print("Starting script...\n")
-        get_all_attendance_data()
+        sats_manual_attendance.manual_attendance()
     elif choice == 4:
+        print("Starting script...\n")
+        get_all_attendance_data()
+    elif choice == 5:
         print("Starting script...\n")
         lesson_id_input = str(input("\n[INPUT] Enter lesson ID:"))
         get_attendance_by_lesson_id(lesson_id_input)
@@ -46,7 +50,7 @@ while loop:
             get_attendance_by_lesson_id(lesson_id_input)
         except:
             print("[ERROR] There was a problem retrieving attendance data. Try again.") """
-    elif choice == 5:
+    elif choice == 6:
         loop = False
     else:
         print("Wrong option selection. Enter any key to try again..")
