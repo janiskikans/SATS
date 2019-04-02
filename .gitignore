@@ -3,3 +3,4 @@ SATS_VENV/
 __pycache__/
 dataset/*
 .DS_STORE
+config/dev_settings.ini
