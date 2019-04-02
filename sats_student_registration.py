@@ -120,9 +120,9 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
                     left = int(left * r)
 
                     # Draw the predicted face name on the image
-                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
                     y = top - 15 if top - 15 > 15 else top + 15
-                    cv2.putText(frame, "ID:" + name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+                    cv2.putText(frame, "ID:" + name, (left, y), cv2.FONT_HERSHEY_DUPLEX, 0.75, (255, 255, 255), 2)
 
                 if writer is None and output is not None:
                     fourcc = cv2.VideoWriter_fourcc(*"MJPG")
@@ -145,9 +145,8 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
     except KeyboardInterrupt:
         tracker.print_diff()
         vs.stop()
+        cv2.destroyAllWindows()
         pass
-
-    cv2.destroyAllWindows()
 
     if writer is not None:
         writer.release()
