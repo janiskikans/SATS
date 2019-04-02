@@ -6,19 +6,22 @@ from get_student_attendance import get_all_attendance_data, get_attendance_by_le
 from sats_ftp_retrieve_stud_images import ftp_retrieve_stud_images_main
 import sats_manual_attendance
 
+#Main script start
 print("\nSATS Main Client By Janis Kikans", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), sep=" | ")
 
 loop = True
 while loop:
     sats_client_functions.print_menu()
-    choice = input("Enter your choice [1-5]:")
+    choice = input("Enter your choice [1-6]:")
     choice = int(choice)
 
     if choice == 1:
-        print("Starting script...\n")
+        print("[INFO] Starting script...\n")
         ftp_retrieve_stud_images_main()
     elif choice == 2:
-        print("Starting script...\n")
+        # Jāievieto pārbaude par to vai ir pieejams "encodings.pickle" fails. Ja nē, tad izmet uz galveno loop ar error message.
+
+        print("[INFO] Starting script...\n")
         auditorium_input = input("[INPUT] Enter auditorium number:")
         auditorium_input = str(auditorium_input)
         
@@ -36,13 +39,13 @@ while loop:
 
         recognition_cam(encodings_file = "encodings.pickle", display = 0, detection_method = "hog", auditorium = auditorium_input, webcam_select = webcam_input)
     elif choice == 3:
-        print("Starting script...\n")
+        print("[INFO] Starting script...\n")
         sats_manual_attendance.manual_attendance()
     elif choice == 4:
-        print("Starting script...\n")
+        print("[INFO] Starting script...\n")
         get_all_attendance_data()
     elif choice == 5:
-        print("Starting script...\n")
+        print("[INFO] Starting script...\n")
         lesson_id_input = str(input("\n[INPUT] Enter lesson ID:"))
         get_attendance_by_lesson_id(lesson_id_input)
         """ try:
@@ -51,6 +54,7 @@ while loop:
         except:
             print("[ERROR] There was a problem retrieving attendance data. Try again.") """
     elif choice == 6:
+        print("[INFO] Exitting SATS..")
         loop = False
     else:
-        print("Wrong option selection. Enter any key to try again..")
+        print("[ERROR] Invalid option selection. Enter any key to try again..")
