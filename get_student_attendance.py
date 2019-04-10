@@ -1,6 +1,7 @@
 import mysql.connector
 from configparser import ConfigParser
 import datetime
+from tabulate import tabulate
 
 # Config parser
 parser = ConfigParser()
@@ -25,14 +26,10 @@ def get_all_attendance_data():
 
     my_cursor = mydb.cursor()
     my_cursor.execute(query)
+    attendance_info = my_cursor.fetchall()
 
     # Result print
-    print("-" * 103)
-    print("%3s %6s %12s %12s %13s   %19s %8s %17s" % ("ID", "Vards", "Uzvards", "Apl. nr.", "Reg. laiks", "Telpas nr.", "Nod. ID", "Pasniedzejs"))
-    print("-" * 103)
-
-    for (id_studentu_uzskaite, vards, uzvards, apliecibas_numurs, registracijas_laiks, telpas_numurs, nodarbibas_id, pasniedzeja_vards, pasniedzeja_uzvards) in my_cursor:
-        print("%3d  %-10s %-11s %8s %21s   %-10s %12s %8s %s" % (id_studentu_uzskaite, vards, uzvards, apliecibas_numurs, registracijas_laiks, telpas_numurs, nodarbibas_id, pasniedzeja_vards, pasniedzeja_uzvards))
+    print_attendance_all(attendance_info, my_cursor)
     
     mydb.close()
 
@@ -45,7 +42,7 @@ def get_attendance_by_lesson_id(lesson_id):
         database = parser.get('db', 'db_database')
     )
 
-    query = """SELECT u.id_studentu_uzskaite, s.vards, s.uzvards, u.apliecibas_numurs, u.registracijas_laiks, u.telpas_numurs, u.nodarbibas_id, p.pasniedzeja_vards, p.pasniedzeja_uzvards
+    query = """SELECT u.id_studentu_uzskaite, s.vards, s.uzvards, u.apliecibas_numurs, u.registracijas_laiks, u.telpas_numurs, p.pasniedzeja_vards, p.pasniedzeja_uzvards
                 FROM studentu_uzskaite AS u 
                 INNER JOIN studenti AS s ON u.apliecibas_numurs = s.apliecibas_numurs
                 INNER JOIN macisanas_saraksts AS m ON u.nodarbibas_id = m.nodarbibas_id
@@ -54,13 +51,19 @@ def get_attendance_by_lesson_id(lesson_id):
 
     my_cursor = mydb.cursor()
     my_cursor.execute(query, (lesson_id,))
+    attendance_info = my_cursor.fetchall()
 
     # Result print
-    print("-" * 103)
-    print("%3s %6s %12s %12s %13s   %19s %8s %17s" % ("ID", "Vards", "Uzvards", "Apl. nr.", "Reg. laiks", "Telpas nr.", "Nod. ID", "Pasniedzejs"))
-    print("-" * 103)
-
-    for (id_studentu_uzskaite, vards, uzvards, apliecibas_numurs, registracijas_laiks, telpas_numurs, nodarbibas_id, pasniedzeja_vards, pasniedzeja_uzvards) in my_cursor:
-        print("%3d  %-10s %-11s %8s %21s   %-10s %12s %8s %s" % (id_studentu_uzskaite, vards, uzvards, apliecibas_numurs, registracijas_laiks, telpas_numurs, nodarbibas_id, pasniedzeja_vards, pasniedzeja_uzvards))
+    print_attendance_by_lesson(attendance_info, my_cursor, lesson_id)
     
     mydb.close()
+
+def print_attendance_by_lesson(attendance_info, mycursor, lesson_id):
+    print("\n[INFO] Found %s attendance records for selected lesson(%s):" %(mycursor.rowcount, lesson_id))
+    table = attendance_info
+    print(tabulate(table, headers = ["ID", "Vārds", "Uzvārds", "Apliecības nr.", "Reg. laiks", "Telpas nr.", "Pasn. vārds", "Pasn. uzvārds"], tablefmt = "psql", stralign = "center"))
+
+def print_attendance_all(attendance_info, mycursor):
+    print("\n[INFO] Found %s attendance records:" %(mycursor.rowcount))
+    table = attendance_info
+    print(tabulate(table, headers = ["ID", "Vārds", "Uzvārds", "Apliecības nr.", "Reg. laiks", "Telpas nr.", "Pasn. vārds", "Pasn. uzvārds", "Nodarbības ID"], tablefmt = "psql", stralign = "center"))
