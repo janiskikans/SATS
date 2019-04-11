@@ -15,8 +15,8 @@ sleep_time = 10
 
 # Config file import
 parser = ConfigParser()
-#parser.read('./config/dev_settings_local.ini') # local
-parser.read('./config/dev_settings.ini') # remote LAN
+parser.read('./config/dev_settings_local.ini') # local
+#parser.read('./config/dev_settings.ini') # remote LAN
 
 # Current lesson vars
 lesson_id = "Null"
@@ -41,16 +41,24 @@ def register_student(student_id, auditorium, lesson_id):
 
     mycursor = mydb.cursor()
 
-    sql_query = """INSERT INTO studentu_uzskaite (apliecibas_numurs, registracijas_laiks, telpas_numurs, nodarbibas_id)
+    sql_query_insert = """INSERT INTO studentu_uzskaite (apliecibas_numurs, registracijas_laiks, telpas_numurs, nodarbibas_id)
     VALUES (%s, %s, %s, %s)"""
-    current_time_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print("[REGISTRATION] Registration time:", current_time_date)
-    values = (student_id, current_time_date, auditorium, lesson_id) #2019-03-19 12:57:00
 
-    mycursor.execute(sql_query, values)
+    current_time_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    values_insert = (student_id, current_time_date, auditorium, lesson_id) #2019-03-19 12:57:00
+
+    mycursor.execute(sql_query_insert, values_insert)
+
+    sql_query_get_student_name = """SELECT uzvards, vards FROM studenti WHERE apliecibas_numurs = %s"""
+    mycursor.execute(sql_query_get_student_name, (student_id,))
+    student_name = mycursor.fetchall()
+
+    for row in student_name:
+        print("[REGISTRATION] Registration time: {0} ({1}, {2})".format(current_time_date, row[0], row[1]))
+
     mydb.commit()
     mydb.close()
-    print("[REGISTRATION]", mycursor.rowcount, "record inserted!")
+    #print("[REGISTRATION]", mycursor.rowcount, "record inserted!")
 
 def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_method = "hog", output = "", auditorium = "Not specified", webcam_select = 0):
     print("\n[INFO] Loading encodings...")
@@ -97,7 +105,7 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
                             counts[name] = counts.get(name, 0) + 1
                     
                         # Determine the recognized face with the largest number of votes (note: in the event of unlikely tie Python will select firt entry in the dictionary)
-                        name = max(counts, key=counts.get)
+                        name = max(counts, key = counts.get)
                 
                     # Update the list of student ids
                     names.append(name)

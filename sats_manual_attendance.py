@@ -4,8 +4,8 @@ import getpass
 
 # Config file import
 parser = ConfigParser()
-#parser.read('./config/dev_settings_local.ini') # local
-parser.read('./config/dev_settings.ini') # remote LAN
+parser.read('./config/dev_settings_local.ini') # local
+#parser.read('./config/dev_settings.ini') # remote LAN
 
 def pass_input():
     password = getpass.getpass("[INPUT] Enter admin password: ")
