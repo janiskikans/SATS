@@ -8,6 +8,7 @@ import imutils
 import pickle
 import time
 import cv2
+import numpy as np
 from pympler.tracker import SummaryTracker
 
 tracker = SummaryTracker()
@@ -15,8 +16,8 @@ sleep_time = 10
 
 # Config file import
 parser = ConfigParser()
-parser.read('./config/dev_settings_local.ini') # local
-#parser.read('./config/dev_settings.ini') # remote LAN
+#parser.read('./config/dev_settings_local.ini') # local
+parser.read('./config/dev_settings.ini') # remote LAN
 
 # Current lesson vars
 lesson_id = "Null"
@@ -93,6 +94,7 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
                 
                 for encoding in encodings:
                     matches = face_recognition.compare_faces(data["encodings"], encoding)
+                    face_distances = face_recognition.face_distance(data["encodings"], encoding)
                     name = "Unknown"
 
                     if True in matches:
@@ -109,7 +111,14 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
                 
                     # Update the list of student ids
                     names.append(name)
-                    print("\n[RECOGNITION] Recognized ID:", name)
+
+                    #print("[INFO] Distances: ", face_distances)
+                    closestImage = np.amin(face_distances)
+
+                    if name != "Unknown":
+                        print("\n[RECOGNITION] Recognized ID: {0} (With Euclidian distance of {1:.2f})".format(name, closestImage))
+                    else:
+                        print("\n[RECOGNITION] Recognized ID: {0} (With Euclidian distance to the closest match of {1:.2f})".format(name, closestImage))
 
                     if name not in reg_student_list and name != "Unknown":
                         reg_student_list.append(name)
