@@ -5,8 +5,8 @@ from tabulate import tabulate
 
 # Config file import
 parser = ConfigParser()
-parser.read('./config/dev_settings_local.ini') # local
-#parser.read('./config/dev_settings.ini') # remote LAN
+#parser.read('./config/dev_settings_local.ini') # local
+parser.read('./config/dev_settings.ini') # remote LAN
 
 def get_auditorium_lesson_list(auditorium_number):
     # MySQL connection details
@@ -32,13 +32,15 @@ def get_auditorium_lesson_list(auditorium_number):
     auditorium_lessons = mycursor.fetchall()
 
     if mycursor.rowcount == 0:
-        print("\n[INFO] There were no lessons found for this audtiorium today!")
+        print("\n[INFO] Netika atrastas nodarbības izvēlētajai telpai, kas notiktu šodien!")
+        #print("\n[INFO] There were no lessons found for this audtiorium today!")
     else:
         lesson_print(auditorium_lessons, auditorium_number, current_date, mycursor)
 
     mydb.close()
 
 def lesson_print(auditorium_lessons, auditorium_number, current_date, mycursor):
-    print("\n[INFO] Lessons found! There are %s lessons happening today(%s) in selected auditorium(%s):" %(mycursor.rowcount, current_date, auditorium_number))
+    #print("\n[INFO] Lessons found! There are %s lessons happening today(%s) in selected auditorium(%s):" %(mycursor.rowcount, current_date, auditorium_number))
+    print("\n[INFO] Nodarbības atrastas! Šodien (%s) notiek %s nodarbības izvēlētajā telpā (%s):" %(current_date, mycursor.rowcount, auditorium_number))  
     table = auditorium_lessons
     print(tabulate(table, headers = ["Sākuma laiks", "Beigu laiks", "Pasn. vārds", "Pasn. uzvārds", "Nodarbības ID", "Kursa nosaukums"], tablefmt = "psql", stralign = "center"))
