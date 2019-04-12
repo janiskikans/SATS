@@ -3,13 +3,12 @@ from configparser import ConfigParser
 import datetime
 from tabulate import tabulate
 
-# Config parser
-parser = ConfigParser()
-#parser.read('config/dev_settings_local.ini') # local
-parser.read('./config/dev_settings.ini') # remote LAN
-
 # Gets all info from studentu_uzskaite table
-def get_all_attendance_data():
+def get_all_attendance_data(config_file_loc):
+    # Config parser
+    parser = ConfigParser()
+    parser.read(config_file_loc)
+
     # MySQL connection
     mydb = mysql.connector.connect(
         host = parser.get('db', 'db_host'),
@@ -34,7 +33,11 @@ def get_all_attendance_data():
     
     mydb.close()
 
-def get_attendance_by_lesson_id(lesson_id):
+def get_attendance_by_lesson_id(lesson_id, config_file_loc):
+    # Config parser
+    parser = ConfigParser()
+    parser.read(config_file_loc)
+
     # MySQL connection
     mydb = mysql.connector.connect(
         host = parser.get('db', 'db_host'),
@@ -60,7 +63,11 @@ def get_attendance_by_lesson_id(lesson_id):
     
     mydb.close()
 
-def get_all_attendance_of_student(student_id):
+def get_all_attendance_of_student(student_id, config_file_loc):
+    # Config parser
+    parser = ConfigParser()
+    parser.read(config_file_loc)
+
     # MySQL connection
     mydb = mysql.connector.connect(
         host = parser.get('db', 'db_host'),

@@ -10,12 +10,12 @@ config['db'] = {
 }
 
 config['ftp'] = {
-    'ftp_address': 'localhost',
+    'ftp_address': '10.136.13.89',
     'ftp_account': 'bakalaurs',
     'ftp_password': 'bakalaurs'
 }
 
-with open('./dev_settings_local.ini', 'w') as f:
+with open('./dev_settings_lnb.ini', 'w') as f:
     config.write(f)
 
 print("Config .ini file successfully created..")

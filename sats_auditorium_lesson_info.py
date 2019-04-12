@@ -3,12 +3,11 @@ import mysql.connector
 import datetime
 from tabulate import tabulate
 
-# Config file import
-parser = ConfigParser()
-#parser.read('./config/dev_settings_local.ini') # local
-parser.read('./config/dev_settings.ini') # remote LAN
+def get_auditorium_lesson_list(auditorium_number, config_file_loc):
+    # Config file import
+    parser = ConfigParser()
+    parser.read(config_file_loc)
 
-def get_auditorium_lesson_list(auditorium_number):
     # MySQL connection details
     mydb = mysql.connector.connect(
         host = parser.get('db', 'db_host'),
