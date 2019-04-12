@@ -14,7 +14,7 @@ args = vars(arg_parser.parse_args()) """
 
 def encode_faces(dataset_dir = "dataset", encodings_file = "encodings.pickle", detection_method = "hog"):
     # Grab the paths to data set input images
-    print("\n[ENCODING] Quantifying dataset images...")
+    print("\n[KODĒŠANA] Skaita bildes...")
     imagePaths = list(paths.list_images(dataset_dir)) # Makes a list of all imagePaths contained in data set directory
 
     # Initialize the lists of know encodings and known IDS
@@ -24,7 +24,7 @@ def encode_faces(dataset_dir = "dataset", encodings_file = "encodings.pickle", d
     # Looping over all the found dataset images
     for (i, imagePath) in enumerate(imagePaths):
         # Getting student id's from the image path
-        print("[ENCODING] Processing image {}/{} with ID '{}'".format(i + 1, len(imagePaths), imagePath.split(os.path.sep)[-2]))
+        print("[KODĒŠANA] Apstrādā bildi {}/{} ar apliecības numuru '{}'".format(i + 1, len(imagePaths), imagePath.split(os.path.sep)[-2]))
         student_id = imagePath.split(os.path.sep)[-2]
 
         # Load the input image and convert it from BGR color space to dlib ordering (RGB). Dlib expects RGB
@@ -45,11 +45,11 @@ def encode_faces(dataset_dir = "dataset", encodings_file = "encodings.pickle", d
             knowIDS.append(student_id)
 
     # Facial encoding + student id dump to a file
-    print("[ENCODING] Serializing encodings...")
+    print("[KODĒŠANA] Serializē kodējumus...")
     data = {"encodings": knowEncodings, "ids": knowIDS} # Constructs dictionaries with 2 keys
     f = open(encodings_file, "wb")
     f.write(pickle.dumps(data))
-    print("[ENCODING] Done!")
+    print("[KODĒŠANA] Pabeigts!")
     f.close()
 
 if __name__ == "__main__":

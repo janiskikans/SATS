@@ -2,35 +2,34 @@ from configparser import ConfigParser
 import mysql.connector
 import getpass
 
-# Config file import
-parser = ConfigParser()
-#parser.read('./config/dev_settings_local.ini') # local
-parser.read('./config/dev_settings.ini') # remote LAN
-
 def pass_input():
-    password = getpass.getpass("[INPUT] Enter admin password: ")
+    password = getpass.getpass("[IEVADE] Ievadiet administratora paroli: ")
     correct = False
     
     if password == "satsadmin":
-        print("[INFO] Password accepted.")
+        print("[INFO] Parole pieņemta.")
         correct = True
     else:
-        print("[INFO] Password incorrect!")
+        print("[INFO] Parole nepareiza!")
         correct = False
 
     return correct
 
-def manual_attendance():
+def manual_attendance(config_file_loc):
+    # Config file import
+    parser = ConfigParser()
+    parser.read(config_file_loc)
+
     check_pass = pass_input()
     if check_pass == True:
-        print("\n", "-" * 27, "Manual attendance input", "-" * 27)
+        print("\n", "-" * 27, "Manuālā apmeklējuma ievade", "-" * 27)
 
-        student_id = input("Enter student ID:")
-        registration_time = input("Enter registration time (YYYY-MM-DD HH:MM:SS):")
-        auditorium_nr = input("Enter auditorium number:")
-        class_id = input("Enter class ID:")
+        student_id = input("Ievadiet studenta apliecības numuru:")
+        registration_time = input("Ievadiet reģistrācijas laiku (YYYY-MM-DD HH:MM:SS):")
+        auditorium_nr = input("Ievadiet telpas numuru:")
+        class_id = input("Ievadiet nodarbības ID:")
 
-        print("Details:", student_id, registration_time, auditorium_nr, class_id)
+        print("Detaļas:", student_id, registration_time, auditorium_nr, class_id)
 
         mydb = mysql.connector.connect(
             host = parser.get('db', 'db_host'),
@@ -48,6 +47,6 @@ def manual_attendance():
         mydb.commit()
         mydb.close()
 
-        print("\n[REGISTRATION]", mycursor.rowcount, "records inserted!")
+        print("\n[REĢISTRĀCIJA]", mycursor.rowcount, "apmeklējuma ieraksti saglabāti!")
     else:
-        print("[INFO] Returning to start.")
+        print("[INFO] Atgriežas uz sākumu.")

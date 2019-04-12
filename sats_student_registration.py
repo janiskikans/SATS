@@ -14,11 +14,6 @@ from pympler.tracker import SummaryTracker
 tracker = SummaryTracker()
 sleep_time = 10
 
-# Config file import
-parser = ConfigParser()
-#parser.read('./config/dev_settings_local.ini') # local
-parser.read('./config/dev_settings.ini') # remote LAN
-
 # Current lesson vars
 lesson_id = "Null"
 lessson_course_number = "Null"
@@ -31,7 +26,7 @@ lesson_teacher_surname = "Null"
 lesson_status = False
 reg_student_list = [] # Registered student id list. Empties before every new class.
 
-def register_student(student_id, auditorium, lesson_id):
+def register_student(student_id, auditorium, lesson_id, parser):
     # MySQL connection details
     mydb = mysql.connector.connect(
         host = parser.get('db', 'db_host'),
@@ -55,32 +50,36 @@ def register_student(student_id, auditorium, lesson_id):
     student_name = mycursor.fetchall()
 
     for row in student_name:
-        print("[REGISTRATION] Registration time: {0} ({1}, {2})".format(current_time_date, row[0], row[1]))
+        print("[REĢISTRĀCIJA] Reģistrācijas laiks: {0} ({1}, {2})".format(current_time_date, row[0], row[1]))
 
     mydb.commit()
     mydb.close()
     #print("[REGISTRATION]", mycursor.rowcount, "record inserted!")
 
-def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_method = "hog", output = "", auditorium = "Not specified", webcam_select = 0):
-    print("\n[INFO] Loading encodings...")
+def recognition_cam(dev_settings_loc, encodings_file = "encodings.pickle", display = 1, detection_method = "hog", output = "", auditorium = "Not specified", webcam_select = 0):
+    # Config file import
+    parser = ConfigParser()
+    parser.read(dev_settings_loc)
+    
+    print("\n[INFO] Ielādē kodējumus...")
 
     # Loading the known faces and encodings from pickle dump
     data = pickle.loads(open(encodings_file, "rb").read())
 
-    print("[INFO] Starting video stream...")
+    print("[INFO] Iegūst video straumi...")
     vs = VideoStream(src = webcam_select).start()
     writer = None
     time.sleep(2.0)
 
     try:
         while True:
-            print("\n[INFO] Checking lesson...")
-            check_lesson(auditorium = auditorium)
+            print("\n[INFO] Pārbauda nodarbības...")
+            check_lesson(parser, auditorium = auditorium)
             if lesson_status is True:
-                print("[INFO] Current lesson: %s (Kursa numurs: %s): \nTelpa: %s\nDatums: %s\nSakuma laiks: %s\nBeigu laiks: %s\nPasn. vārds: %s\nPasn. uzvārds: %s" % (lesson_id, lessson_course_number, lesson_auditorium, lesson_date, lesson_start_time, lesson_end_time, lesson_teacher_name, lesson_teacher_surname))
+                print("[INFO] Šobrīd notiekošā nodarbība: %s (Kursa numurs: %s): \nTelpa: %s\nDatums: %s\nSakuma laiks: %s\nBeigu laiks: %s\nPasn. vārds: %s\nPasn. uzvārds: %s" % (lesson_id, lessson_course_number, lesson_auditorium, lesson_date, lesson_start_time, lesson_end_time, lesson_teacher_name, lesson_teacher_surname))
 
             while lesson_status == True:
-                check_lesson(auditorium = auditorium)
+                check_lesson(parser, auditorium = auditorium)
                 
                 frame = vs.read()
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -116,17 +115,17 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
                     closestImage = np.amin(face_distances)
 
                     if name != "Unknown":
-                        print("\n[RECOGNITION] Recognized ID: {0} (With Euclidian distance of {1:.2f})".format(name, closestImage))
+                        print("\n[IDENTIFIKĀCIJA] Identificētais apliecības nr.: {0} (Ar Eiklīda distanci {1:.2f})".format(name, closestImage))
                     else:
-                        print("\n[RECOGNITION] Recognized ID: {0} (With Euclidian distance to the closest match of {1:.2f})".format(name, closestImage))
+                        print("\n[IDENTIFIKĀCIJA] Identificētais apliecības nr.: {0} (Ar Eiklīda distanci no tuvākā atbilstošā studenta {1:.2f})".format(name, closestImage))
 
                     if name not in reg_student_list and name != "Unknown":
                         reg_student_list.append(name)
-                        register_student(name, auditorium, lesson_id)
+                        register_student(name, auditorium, lesson_id, parser)
                     elif name in reg_student_list:
-                        print("[RECOGNITION] Student already in list!")
+                        print("[IDENTIFIKĀCIJA] Students jau ir apmeklējuma sarakstā!")
                     else:
-                        print("[RECOGNITION] Not recognized!")
+                        print("[IDENTIFIKĀCIJA] Nav identificēts!")
 
                 # Loop over the recognized faces
                 for ((top, right, bottom, left), name) in zip(boxes, names):
@@ -169,7 +168,7 @@ def recognition_cam(encodings_file = "encodings.pickle", display = 1, detection_
         writer.release()
 
 
-def check_lesson(auditorium): # Checks what lesson is happening in selected auditorium at the time
+def check_lesson(parser, auditorium): # Checks what lesson is happening in selected auditorium at the time
     global lesson_id
     global lessson_course_number
     global lesson_auditorium
@@ -216,7 +215,7 @@ def check_lesson(auditorium): # Checks what lesson is happening in selected audi
     else:
         lesson_status = False
         clear_current_class_vars()
-        print("[INFO] No current lesson found! Not checking attendance. Sleeping for %s seconds..." %(int(sleep_time)))
+        print("[INFO] Netika atrasta šobrīd notiekoša nodarbība! Netiek veikta apmeklējuma uzskaite. Nav aktīvs uz  %s sekundēm.." %(int(sleep_time)))
 
     mydb.close()
 
