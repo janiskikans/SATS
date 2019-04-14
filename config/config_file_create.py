@@ -20,7 +20,7 @@ config['sats_setting_vars'] = {
     'unknown_face_save_loc' = 'unknown_faces'
 }
 
-with open('./dev_settings_lnb.ini', 'w') as f:
+with open('./dev_settings.ini', 'w') as f:
     config.write(f)
 
 print("Config .ini file successfully created..")
