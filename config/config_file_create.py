@@ -10,14 +10,14 @@ config['db'] = {
 }
 
 config['ftp'] = {
-    'ftp_address': '10.136.13.89',
+    'ftp_address': 'localhost',
     'ftp_account': 'bakalaurs',
     'ftp_password': 'bakalaurs'
 }
 
 config['sats_setting_vars'] = {
     'unknown_face_save': 'False',
-    'unknown_face_save_loc' = 'unknown_faces'
+    'unknown_face_save_loc': 'unknown_faces'
 }
 
 with open('./dev_settings.ini', 'w') as f:

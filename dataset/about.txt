@@ -1,1 +1,5 @@
-dataset contains student faces organized into subdirectories based on their respective names
+Dataset contains student faces organized into subdirectories based on their respective names
+
+../SATS/dataset/000AAA000/000AAA000_1.jpg
+../SATS/dataset/000AAA000/000AAA000_2.jpg
+../SATS/dataset/<student_id>/<image_name>.jpg
