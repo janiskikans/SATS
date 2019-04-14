@@ -20,7 +20,7 @@ def ftp_connect(img_ref_list, student_sel, ftp_address, ftp_account, ftp_passwor
                 ftp_get_images(ftp, img_ref_list, student_sel)
                 break
         except ftplib.all_errors as e:
-            print("[ERROR] Error connecting to FTP server!", e)
+            print("[KĻŪDA] Kļūda izveidojot savienojumu ar FTP serveri!", e)
 
 def ftp_get_images(ftp, img_ref_list, student_sel):
     global retr_images
@@ -113,17 +113,17 @@ def ftp_retrieve_stud_images_main(dev_settings_loc):
 
         retr_students += 1
 
-    print("\n[INFO] Attēlu ieguve pabeigta! Iegūtas {} studentu bildes (Kopā {} attēli)!.".format(retr_students, retr_images))
+    print("\n[INFO] Attēlu ieguve pabeigta! Iegūtas {} studentu bildes (Kopā {} attēli).".format(retr_students, retr_images))
 
     # Check if also encode retrieved student images
     choice = None
     while choice not in ("y", "n", "yes", "no"):
-        choice = input("[INPUT] Vai vēlaties kodēt iegūtos attēlus? (y/n): ")
+        choice = input("\n[INPUT] Vai vēlaties kodēt iegūtos attēlus? (y/n): ")
         if choice == "y" or choice == "yes":
             # Run encode faces script with parameters
             encode_faces()
         elif choice == "n" or choice == "no":
-            print("[INFO] Ieguves skripts pabeigts!")
+            print("\n[INFO] Attēlu ieguves skripts pabeigts!")
             break
         else:
             print("[KĻŪDA] Ievads kļūda! Ievadiet y vai n.")
