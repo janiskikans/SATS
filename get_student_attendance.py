@@ -22,7 +22,8 @@ def get_all_attendance_data(config_file_loc):
                 INNER JOIN studenti AS s ON u.apliecibas_numurs = s.apliecibas_numurs
                 INNER JOIN macisanas_saraksts AS m ON u.nodarbibas_id = m.nodarbibas_id
                 INNER JOIN pasniedzeji AS p ON m.pasniedzeja_id = p.pasniedzeja_id
-                INNER JOIN nodarbibas AS n ON u.nodarbibas_id = n.nodarbibas_id"""
+                INNER JOIN nodarbibas AS n ON u.nodarbibas_id = n.nodarbibas_id
+                ORDER BY u.registracijas_laiks"""
 
     my_cursor = mydb.cursor()
     my_cursor.execute(query)
@@ -52,7 +53,8 @@ def get_attendance_by_lesson_id(lesson_id, config_file_loc):
                 INNER JOIN macisanas_saraksts AS m ON u.nodarbibas_id = m.nodarbibas_id
                 INNER JOIN pasniedzeji AS p ON m.pasniedzeja_id = p.pasniedzeja_id
                 INNER JOIN nodarbibas AS n ON u.nodarbibas_id = n.nodarbibas_id
-                WHERE u.nodarbibas_id = %s"""
+                WHERE u.nodarbibas_id = %s
+                ORDER BY u.registracijas_laiks"""
 
     my_cursor = mydb.cursor()
     my_cursor.execute(query, (lesson_id,))
