@@ -2,3 +2,7 @@ SATS_VENV/
 .vscode/
 __pycache__/
 dataset/*
+.DS_STORE
+config/*
+!config/config_file_create.py
+!config/dev_settings_local.ini

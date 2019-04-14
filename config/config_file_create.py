@@ -10,12 +10,17 @@ config['db'] = {
 }
 
 config['ftp'] = {
-    'ftp_address': 'localhost',
+    'ftp_address': '10.136.13.89',
     'ftp_account': 'bakalaurs',
     'ftp_password': 'bakalaurs'
 }
 
-with open('./dev_settings_local.ini', 'w') as f:
+config['sats_setting_vars'] = {
+    'unknown_face_save': 'False',
+    'unknown_face_save_loc' = 'unknown_faces'
+}
+
+with open('./dev_settings.ini', 'w') as f:
     config.write(f)
 
 print("Config .ini file successfully created..")
