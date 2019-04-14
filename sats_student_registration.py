@@ -10,6 +10,7 @@ import time
 import cv2
 import numpy as np
 from pympler.tracker import SummaryTracker
+from PIL import Image
 
 tracker = SummaryTracker()
 sleep_time = 10
@@ -50,7 +51,7 @@ def register_student(student_id, auditorium, lesson_id, parser):
     student_name = mycursor.fetchall()
 
     for row in student_name:
-        print("[REĢISTRĀCIJA] Reģistrācijas laiks: {0} ({1}, {2})".format(current_time_date, row[0], row[1]))
+        print("[JAUNA REĢISTRĀCIJA] Reģistrācijas laiks: {0} ({1}, {2})".format(current_time_date, row[0], row[1]))
 
     mydb.commit()
     mydb.close()
@@ -60,7 +61,10 @@ def recognition_cam(dev_settings_loc, encodings_file = "encodings.pickle", displ
     # Config file import
     parser = ConfigParser()
     parser.read(dev_settings_loc)
-    
+
+    unknow_face_save = parser.get('sats_setting_vars', 'unknown_face_save')
+    unknown_face_save_loc = parser.get('sats_setting_vars', 'unknown_face_save_loc')
+
     print("\n[INFO] Ielādē kodējumus...")
 
     # Loading the known faces and encodings from pickle dump
@@ -119,12 +123,30 @@ def recognition_cam(dev_settings_loc, encodings_file = "encodings.pickle", displ
                     else:
                         print("\n[IDENTIFIKĀCIJA] Identificētais apliecības nr.: {0} (Ar Eiklīda distanci no tuvākā atbilstošā studenta {1:.2f})".format(name, closestImage))
 
+                    fetch_registered_student_list(lesson_id, parser) # Fetch current registred student list
+
                     if name not in reg_student_list and name != "Unknown":
-                        reg_student_list.append(name)
+                        #reg_student_list.append(name)
                         register_student(name, auditorium, lesson_id, parser)
+
                     elif name in reg_student_list:
-                        print("[IDENTIFIKĀCIJA] Students jau ir apmeklējuma sarakstā!")
+                        print("[IDENTIFIKĀCIJA] Students jau ir reģistrēts apmeklējuma sarakstā!")
                     else:
+                        if unknow_face_save == "True":
+                            for face_location in boxes:
+                                top, right, bottom, left = face_location
+                                face_image = rgb[top:bottom, left:right]
+                                pil_image = Image.fromarray(face_image)
+
+                                current_time = datetime.datetime.now()
+                                file_name = "nezinams_" + current_time.strftime("%Y%m%d_%H%M%S") + "_" + auditorium + ".jpeg"
+                                
+                                os.chdir("%s" %str(unknown_face_save_loc))
+                                pil_image.save(file_name, "JPEG")
+                                os.chdir('..')
+
+                                print("[IMAGE SAVE] Attēls {0} saglabāts!".format(file_name))
+
                         print("[IDENTIFIKĀCIJA] Nav identificēts!")
 
                 # Loop over the recognized faces
@@ -192,7 +214,7 @@ def check_lesson(parser, auditorium): # Checks what lesson is happening in selec
     sql_query = "SELECT n.nodarbibas_id, n.kursa_numurs, n.telpa, n.datums, n.sakuma_laiks, n.beigu_laiks, p.pasniedzeja_vards, p.pasniedzeja_uzvards FROM macisanas_saraksts AS m INNER JOIN nodarbibas AS n ON m.nodarbibas_id = n.nodarbibas_id INNER JOIN pasniedzeji AS p ON m.pasniedzeja_id = p.pasniedzeja_id WHERE n.datums = %s AND %s BETWEEN SUBTIME(n.sakuma_laiks, '0:10:0.000000') AND n.beigu_laiks AND n.telpa = %s"
     current_date = datetime.datetime.now().strftime("%Y-%m-%d")
     current_time = datetime.datetime.now().strftime("%H:%M:%S")
-    #print("[TEST] Current time and date, auditorium:", str(current_date), str(current_time), auditorium)
+
     values = (current_date, current_time, auditorium)
 
     lesson_check_cursor.execute(sql_query, values)
@@ -240,6 +262,30 @@ def clear_current_class_vars():
     lesson_end_time = "Null"
     lesson_teacher_name = "Null"
     lesson_teacher_surname = "Null"
+
+def fetch_registered_student_list(lesson_id, parser):
+    global reg_student_list
+
+    mydb = mysql.connector.connect(
+        host = parser.get('db', 'db_host'),
+        user = parser.get('db', 'db_user'),
+        passwd = parser.get('db', 'db_passwd'),
+        database = parser.get('db', 'db_database')
+    )
+
+    reg_student_list_cursor = mydb.cursor()
+    sql_query = """SELECT apliecibas_numurs FROM studentu_uzskaite WHERE nodarbibas_id = %s"""
+
+    reg_student_list_cursor.execute(sql_query, (lesson_id,))
+    rows = reg_student_list_cursor.fetchall()
+
+    reg_student_list.clear()
+
+    for row in rows:
+        reg_student_list.append(row[0])
+
+    mydb.close()
+
 
 def print_list(input_list):
     for items in input_list:
