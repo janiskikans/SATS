@@ -5,13 +5,6 @@ import pickle
 import cv2
 import os
 
-""" # Argument parser and parsing command line arguments
-arg_parser = argparse.ArgumentParser()
-arg_parser.add_argument("-i", "--dataset", required = True, default = "dataset", help = "Path to dataset directory")
-arg_parser.add_argument("-e", "--encodings", required = True, default = "encodings.pickle", help = "Path to serialized database of facial encodings")
-arg_parser.add_argument("-d", "--detection-method", type = str, default = "cnn", help = "Desired face detecton model (hog/cnn)")
-args = vars(arg_parser.parse_args()) """
-
 def encode_faces(dataset_dir = "dataset", encodings_file = "encodings.pickle", detection_method = "hog"):
     # Grab the paths to data set input images
     print("\n[KODĒŠANA] Skaita bildes...")
