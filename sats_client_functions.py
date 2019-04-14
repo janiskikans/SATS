@@ -1,3 +1,6 @@
+from configparser import ConfigParser
+from tabulate import tabulate
+
 # Main client menu printout
 def print_menu():
     #print("\n", 36 * "-", "MENU", 36 * "-")
@@ -17,5 +20,18 @@ def print_menu():
     print("5. Iegūt apmeklējuma informāciju izvēlētajai NODARBĪBAI (MySQL)")
     print("6. Iegūt apmeklējuma informāciju izvēlētajam STUDENTAM (MySQL)")
     print("7. Iegūt informāciju par šodienas nodarbībām izvēlētajā TELPĀ (MySQL)")
-    print("8. Iziet no SATS")
+    print("8. Skatīt programmas izmantotos uzstādījumus")
+    print("9. Iziet no SATS")
     print(79 * "-")
+
+def print_used_settings(config_file_loc):
+    parser = ConfigParser()
+    parser.read(config_file_loc)
+
+    data = [["FTP adrese", parser.get('ftp', 'ftp_address')], ["FTP lietotājs", parser.get('ftp', 'ftp_account')], ["FTP parole", parser.get('ftp', 'ftp_password')],\
+    ["MySQL adrese", parser.get('db', 'db_host')], ["MySQL lietotājs", parser.get('db', 'db_user')], ["MySQL parole", parser.get('db', 'db_passwd')],\
+    ["MySQL datubāze", parser.get('db', 'db_database')], ["unknow_face_save", parser.get('sats_setting_vars', 'unknown_face_save')],\
+    ["unknow_face_save_loc", parser.get('sats_setting_vars', 'unknown_face_save_loc')]]
+
+    print("\n[INFO] SATS izmantotie uzstādījumi ({0}):".format(config_file_loc))
+    print(tabulate(data, headers = ["Uzstādījuma nosaukums", "Uzstādījuma vērtība"], tablefmt = "psql", colalign = ["left", "center"]))

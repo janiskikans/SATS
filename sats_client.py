@@ -8,7 +8,7 @@ import sats_manual_attendance # Enter attendance data manually.
 import sats_auditorium_lesson_info # Information about what lessons are happening in selected auditorium today.
 
 # Globals
-config_file_loc = './config/dev_settings_lnb.ini'
+config_file_loc = './config/dev_settings.ini'
 
 # Main script start
 print("\nSATS Main Client By Janis Kikans", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), sep=" | ")
@@ -16,7 +16,7 @@ print("\nSATS Main Client By Janis Kikans", datetime.datetime.now().strftime('%Y
 loop = True
 while loop:
     sats_client_functions.print_menu()
-    choice = input("Ievadiet Jūsu izvēli [1-8]:")
+    choice = input("Ievadiet Jūsu izvēli [1-9]:")
     choice = int(choice)
 
     if choice == 1:
@@ -64,7 +64,9 @@ while loop:
 
         sats_auditorium_lesson_info.get_auditorium_lesson_list(auditorium_input, config_file_loc)
     elif choice == 8:
-        print("[INFO] Iziet no SATS..")
+        sats_client_functions.print_used_settings(config_file_loc)
+    elif choice == 9:
+        print("[INFO] Iziet no SATS..\n")
         loop = False
     else:
         print("[KĻŪDA] Nepareiza izvēle. Mēģiniet vēlreiz!")
