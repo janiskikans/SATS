@@ -20,9 +20,10 @@ def print_menu():
     print("5. Iegūt apmeklējuma informāciju izvēlētajai NODARBĪBAI (MySQL)")
     print("6. Iegūt apmeklējuma informāciju izvēlētajam STUDENTAM (MySQL)")
     print("7. Iegūt informāciju par šodienas nodarbībām izvēlētajā TELPĀ (MySQL)")
-    print("8. Skatīt programmas izmantotos uzstādījumus")
-    print("9. Iziet no SATS")
-    print(79 * "-")
+    print("8. IZDZĒST apmeklējuma ierakstu (MySQL)")
+    print("9. Skatīt programmas izmantotos uzstādījumus")
+    print("10. Iziet no SATS")
+    print(82 * "-")
 
 def print_used_settings(config_file_loc):
     parser = ConfigParser()
@@ -31,7 +32,8 @@ def print_used_settings(config_file_loc):
     data = [["FTP adrese", parser.get('ftp', 'ftp_address')], ["FTP lietotājs", parser.get('ftp', 'ftp_account')], ["FTP parole", parser.get('ftp', 'ftp_password')],\
     ["MySQL adrese", parser.get('db', 'db_host')], ["MySQL lietotājs", parser.get('db', 'db_user')], ["MySQL parole", parser.get('db', 'db_passwd')],\
     ["MySQL datubāze", parser.get('db', 'db_database')], ["unknow_face_save", parser.get('sats_setting_vars', 'unknown_face_save')],\
-    ["unknow_face_save_loc", parser.get('sats_setting_vars', 'unknown_face_save_loc')]]
+    ["unknow_face_save_loc", parser.get('sats_setting_vars', 'unknown_face_save_loc')], ["html_save_loc", parser.get('sats_setting_vars', 'html_save_loc')],\
+    ["html_report_save_toggle", parser.get('sats_setting_vars', 'html_report_save_toggle')]]
 
     print("\n[INFO] SATS izmantotie uzstādījumi ({0}):".format(config_file_loc))
     print(tabulate(data, headers = ["Uzstādījuma nosaukums", "Uzstādījuma vērtība"], tablefmt = "psql", colalign = ["left", "center"]))
