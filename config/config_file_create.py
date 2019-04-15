@@ -17,10 +17,12 @@ config['ftp'] = {
 
 config['sats_setting_vars'] = {
     'unknown_face_save': 'False',
-    'unknown_face_save_loc': 'unknown_faces'
+    'unknown_face_save_loc': 'unknown_faces',
+    'html_save_loc': 'html_attendance_reports',
+    'html_report_save_toggle': 'False'
 }
 
-with open('./dev_settings.ini', 'w') as f:
+with open('./dev_settings_local.ini', 'w') as f:
     config.write(f)
 
 print("Config .ini file successfully created..")

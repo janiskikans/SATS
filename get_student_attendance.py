@@ -2,9 +2,11 @@ import mysql.connector
 from configparser import ConfigParser
 import datetime
 from tabulate import tabulate
+import HTML
+import os
 
 # Gets all info from studentu_uzskaite table
-def get_all_attendance_data(config_file_loc):
+def get_all_attendance_data(config_file_loc, html_save_loc, html_report_save_toggle):
     # Config parser
     parser = ConfigParser()
     parser.read(config_file_loc)
@@ -31,10 +33,13 @@ def get_all_attendance_data(config_file_loc):
 
     # Result print
     print_attendance_all(attendance_info, my_cursor)
-    
+
+    if html_report_save_toggle == "True":
+        print_html_all_attendance(attendance_info, html_save_loc)
+
     mydb.close()
 
-def get_attendance_by_lesson_id(lesson_id, config_file_loc):
+def get_attendance_by_lesson_id(lesson_id, config_file_loc, html_save_loc, html_report_save_toggle):
     # Config parser
     parser = ConfigParser()
     parser.read(config_file_loc)
@@ -62,10 +67,13 @@ def get_attendance_by_lesson_id(lesson_id, config_file_loc):
 
     # Result print
     print_attendance_by_lesson(attendance_info, my_cursor, lesson_id)
-    
+
+    if html_report_save_toggle == "True":
+        print_html_attendance_by_lesson_id(attendance_info, html_save_loc, lesson_id)
+
     mydb.close()
 
-def get_all_attendance_of_student(student_id, config_file_loc):
+def get_all_attendance_of_student(student_id, config_file_loc, html_save_loc, html_report_save_toggle):
     # Config parser
     parser = ConfigParser()
     parser.read(config_file_loc)
@@ -100,6 +108,9 @@ def get_all_attendance_of_student(student_id, config_file_loc):
     # Result print
     print_attendance_by_student(attendance_info, student_name_info, my_cursor, student_id)
 
+    if html_report_save_toggle == "True":
+        print_html_attendance_by_student(attendance_info, html_save_loc, student_id)
+
     mydb.close()
 
 def print_attendance_by_lesson(attendance_info, mycursor, lesson_id):
@@ -121,3 +132,72 @@ def print_attendance_by_student(attendance_info, student_name_info, mycursor, st
     else:
         table = attendance_info
         print(tabulate(table, headers = ["ID", "Reg. laiks", "Telpas nr.", "Kursa nosauk.", "Nodarbības ID", "Pasn. vārds", "Pasn. uzvārds"], tablefmt = "psql", stralign = "center"))
+
+def print_html_all_attendance(attendance_info, html_save_loc):
+    current_date_time = datetime.datetime.now()
+
+    os.chdir(html_save_loc)
+
+    html_file = ("all_attendance_report_" + current_date_time.strftime('%Y%m%d_%H%M%S') + ".html")
+    f = open(html_file, 'w')
+
+    htmlcode = HTML.table(attendance_info, header_row = ["ID", "Vārds", "Uzvārds", "Apliecības nr.", "Reg. laiks", "Telpas nr.", "Kursa nosauk.", "Nodarbības ID", "Pasn. vārds", "Pasn. uzvārds"])
+    
+    f.write("<h4>SATS</h4>")
+    f.write("<h3>Informācija par visiem apmeklējumiem:</h3>")
+    f.write(htmlcode)
+    f.write("<br>")
+    f.write("Iegūts: " + current_date_time.strftime('%Y-%m-%d %H:%M:%S'))
+    f.write("<p>")
+
+    f.close()
+
+    os.chdir("..")
+
+    print("/n[INFO] Apmeklējumu ieraksti saglabāti! (/" + html_file + ")")
+
+def print_html_attendance_by_student(attendance_info, html_save_loc, student_id):
+    current_date_time = datetime.datetime.now()
+
+    os.chdir(html_save_loc)
+
+    html_file = ("attendance_by_student_report_" + student_id + "_" + current_date_time.strftime('%Y%m%d_%H%M%S') + ".html")
+    f = open(html_file, 'w')
+
+    htmlcode = HTML.table(attendance_info, header_row = ["ID", "Reg. laiks", "Telpas nr.", "Kursa nosauk.", "Nodarbības ID", "Pasn. vārds", "Pasn. uzvārds"])
+    
+    f.write("<h4>SATS</h4>")
+    f.write("<h3>Informācija par studenta ({0}) apmeklējumu:</h3>".format(student_id))
+    f.write(htmlcode)
+    f.write("<br>")
+    f.write("Iegūts: " + current_date_time.strftime('%Y-%m-%d %H:%M:%S'))
+    f.write("<p>")
+
+    f.close()
+
+    os.chdir("..")
+
+    print("\n[INFO] Apmeklējumu ieraksti saglabāti! (/" + html_file + ")")
+
+def print_html_attendance_by_lesson_id(attendance_info, html_save_loc, lesson_id):
+    current_date_time = datetime.datetime.now()
+
+    os.chdir(html_save_loc)
+
+    html_file = ("attendance_by_lesson_report_" + lesson_id + "_" + current_date_time.strftime('%Y%m%d_%H%M%S') + ".html")
+    f = open(html_file, 'w')
+
+    htmlcode = HTML.table(attendance_info, header_row = ["ID", "Vārds", "Uzvārds", "Apliecības nr.", "Reg. laiks", "Telpas nr.", "Kursa nosauk.", "Pasn. vārds", "Pasn. uzvārds"])
+    
+    f.write("<h4>SATS</h4>")
+    f.write("<h3>Informācija par nodarbības ({0}) apmeklējumu:</h3>".format(lesson_id))
+    f.write(htmlcode)
+    f.write("<br>")
+    f.write("Iegūts: " + current_date_time.strftime('%Y-%m-%d %H:%M:%S'))
+    f.write("<p>")
+
+    f.close()
+
+    os.chdir("..")
+
+    print("\n[INFO] Apmeklējumu ieraksti saglabāti! (/" + html_file + ")")
