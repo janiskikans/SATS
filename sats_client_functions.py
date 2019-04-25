@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 from tabulate import tabulate
-
+import os
 # Main client menu printout
 def print_menu():
     #print("\n", 36 * "-", "MENU", 36 * "-")
@@ -13,8 +13,11 @@ def print_menu():
     #print("7. Get information about today's lessons BY AUDITORIUM (MySQL)")
     #print("8. Exit SATS")
     print("\n", 36 * "-", "Izvēlne", 36 * "-")
-    print("1. IEGŪT pieejamās studentu bildes un tās KODĒT")
-    print("2. Sākt automātisko apmeklējuma reģistrāciju")
+    if os.path.exists('./encodings.pickle') == True:
+        print("1. SAGATAVOT studentu informāciju (NAV nepieciešams)")
+    else:
+        print("1. SAGATAVOT studentu informāciju (IR nepieciešams)")
+    print("2. Sākt AUTOMĀTISKO apmeklējuma reģistrāciju")
     print("3. Ievadīt apmeklējuma informāciju MANUĀLI (MySQL)")
     print("4. Iegūt informāciju par VISIEM apmeklējumiem (MySQL)")
     print("5. Iegūt apmeklējuma informāciju izvēlētajai NODARBĪBAI (MySQL)")
