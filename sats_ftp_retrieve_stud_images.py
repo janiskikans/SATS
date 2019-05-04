@@ -118,9 +118,8 @@ def ftp_retrieve_stud_images_main(dev_settings_loc):
     # Check if also encode retrieved student images
     choice = None
     while choice not in ("y", "n", "yes", "no"):
-        choice = input("\n[INPUT] Vai vēlaties kodēt iegūtos attēlus? (y/n): ")
+        choice = input("\n[INPUT] Vai vēlaties sagatavot iegūto attēlu mērījumus? (y/n): ")
         if choice == "y" or choice == "yes":
-            # Run encode faces script with parameters
             encode_faces()
         elif choice == "n" or choice == "no":
             print("\n[INFO] Attēlu ieguves skripts pabeigts!")
