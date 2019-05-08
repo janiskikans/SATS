@@ -8,3 +8,4 @@ config/*
 !config/dev_settings_local.ini
 test_images/
 unknown_faces/*
+test_scripts/
