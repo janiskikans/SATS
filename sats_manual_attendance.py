@@ -3,6 +3,7 @@ import mysql.connector
 import getpass
 from tabulate import tabulate
 
+# Check entered password against predefined master password.
 def pass_input():
     password = getpass.getpass("[IEVADE] Ievadiet administratora paroli: ")
     correct = False
@@ -16,8 +17,9 @@ def pass_input():
 
     return correct
 
+# Enter attendance data manually.
 def manual_attendance(config_file_loc):
-    # Config file import
+    # Config file import.
     parser = ConfigParser()
     parser.read(config_file_loc)
 
@@ -52,7 +54,9 @@ def manual_attendance(config_file_loc):
     else:
         print("[INFO] Atgriežas uz sākumu.")
 
+# Delete a specific attendance record by it's ID.
 def delete_attendance_record(attendance_id, config_file_loc):
+    # Config file import.
     parser = ConfigParser()
     parser.read(config_file_loc)
 
@@ -79,6 +83,7 @@ def delete_attendance_record(attendance_id, config_file_loc):
             table_data = attendance_records
             print(tabulate(table_data, headers = ["ID", "Apliecības numurs", "Uzvārds", "Vārds", "Reģistrācijas laiks", "Nodarbības ID", "Kursa nosauk.", "Telpas numurs"], tablefmt = "psql", stralign = "center"))
 
+        # Check if user really wants to delete the attendance record.
         user_choice = None
         while user_choice not in ("y", "n", "yes", "no"):
             user_choice = input("\n[IEVADE] Vai tiešām vēlaties dzēst izvēlēto apmeklējuma ierakstu? (y/n): ")

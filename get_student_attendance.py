@@ -5,13 +5,13 @@ from tabulate import tabulate
 import HTML
 import os
 
-# Gets all info from studentu_uzskaite table
+# Gets all attendance information from studentu_uzskaite table.
 def get_all_attendance_data(config_file_loc, html_save_loc, html_report_save_toggle):
-    # Config parser
+    # Config file import.
     parser = ConfigParser()
     parser.read(config_file_loc)
 
-    # MySQL connection
+    # MySQL connection.
     mydb = mysql.connector.connect(
         host = parser.get('db', 'db_host'),
         user = parser.get('db', 'db_user'),
@@ -39,8 +39,9 @@ def get_all_attendance_data(config_file_loc, html_save_loc, html_report_save_tog
 
     mydb.close()
 
+# Retrieve all attendance data corresponding to the selected lesson ID.
 def get_attendance_by_lesson_id(lesson_id, config_file_loc, html_save_loc, html_report_save_toggle):
-    # Config parser
+    # Config file import.
     parser = ConfigParser()
     parser.read(config_file_loc)
 
@@ -65,20 +66,22 @@ def get_attendance_by_lesson_id(lesson_id, config_file_loc, html_save_loc, html_
     my_cursor.execute(query, (lesson_id,))
     attendance_info = my_cursor.fetchall()
 
-    # Result print
+    # Print all attendance records with the selected lesson ID.
     print_attendance_by_lesson(attendance_info, my_cursor, lesson_id)
 
+    # Save attendance information to HTML file if option selected.
     if html_report_save_toggle == "True":
         print_html_attendance_by_lesson_id(attendance_info, html_save_loc, lesson_id)
 
     mydb.close()
 
+# Retrieve all attendance records corresponding to the selected student ID.
 def get_all_attendance_of_student(student_id, config_file_loc, html_save_loc, html_report_save_toggle):
-    # Config parser
+    # Config file import.
     parser = ConfigParser()
     parser.read(config_file_loc)
 
-    # MySQL connection
+    # MySQL connection.
     mydb = mysql.connector.connect(
         host = parser.get('db', 'db_host'),
         user = parser.get('db', 'db_user'),
@@ -98,31 +101,37 @@ def get_all_attendance_of_student(student_id, config_file_loc, html_save_loc, ht
     my_cursor.execute(query, (student_id,))
     attendance_info = my_cursor.fetchall()
 
-    # Get student name and surname
+    # Get input student's information from database.
     query_student_name = """SELECT s.uzvards, s.vards FROM studenti AS s
                             WHERE s.apliecibas_numurs = %s"""
     my_cursor_student_name = mydb.cursor()
     my_cursor_student_name.execute(query_student_name, (student_id,))
     student_name_info = my_cursor_student_name.fetchall()
 
-    # Result print
+    # Print out all retrieved attendance records corresponding to the input student ID.
     print_attendance_by_student(attendance_info, student_name_info, my_cursor, student_id)
 
+    # Save attendance information to HTML file if option selected.
     if html_report_save_toggle == "True":
         print_html_attendance_by_student(attendance_info, html_save_loc, student_id)
 
     mydb.close()
 
+# Print out all attendance records corresponding to the input lesson ID.
 def print_attendance_by_lesson(attendance_info, mycursor, lesson_id):
     print("\n[INFO] Tika atrasti %s apmeklējuma ieraksti izvēlētajai nodarbībai (%s):" %(mycursor.rowcount, lesson_id))
+
     table = attendance_info
     print(tabulate(table, headers = ["ID", "Vārds", "Uzvārds", "Apliecības nr.", "Reg. laiks", "Telpas nr.", "Kursa nosauk.", "Pasn. vārds", "Pasn. uzvārds"], tablefmt = "psql", stralign = "center"))
 
+# Print out all attendance records in the database table.
 def print_attendance_all(attendance_info, mycursor):
     print("\n[INFO] Tika atrasti %s apmeklējuma ieraksti:" %(mycursor.rowcount))
+
     table = attendance_info
     print(tabulate(table, headers = ["ID", "Vārds", "Uzvārds", "Apliecības nr.", "Reg. laiks", "Telpas nr.", "Kursa nosauk.", "Nodarbības ID", "Pasn. vārds", "Pasn. uzvārds"], tablefmt = "psql", stralign = "center"))
 
+# Print out all attendance records corresponding to the input student ID.
 def print_attendance_by_student(attendance_info, student_name_info, mycursor, student_id):
     for row in student_name_info:
         print("\n[INFO] Tika atrasti {0} apmeklējuma ieraksti izvēlētajam studentam(ID: {1}, Vārds: {2}, {3})".format(mycursor.rowcount, student_id, row[0], row[1]))
@@ -133,6 +142,7 @@ def print_attendance_by_student(attendance_info, student_name_info, mycursor, st
         table = attendance_info
         print(tabulate(table, headers = ["ID", "Reg. laiks", "Telpas nr.", "Kursa nosauk.", "Nodarbības ID", "Pasn. vārds", "Pasn. uzvārds"], tablefmt = "psql", stralign = "center"))
 
+# Save all attendance records to a HTML table. Save the file.
 def print_html_all_attendance(attendance_info, html_save_loc):
     current_date_time = datetime.datetime.now()
 
@@ -156,6 +166,7 @@ def print_html_all_attendance(attendance_info, html_save_loc):
 
     print("/n[INFO] Apmeklējumu ieraksti saglabāti! (/" + html_file + ")")
 
+# Save all attendance records corresponding to specific student ID to a HTML table. Save the file.
 def print_html_attendance_by_student(attendance_info, html_save_loc, student_id):
     current_date_time = datetime.datetime.now()
 
@@ -179,6 +190,7 @@ def print_html_attendance_by_student(attendance_info, html_save_loc, student_id)
 
     print("\n[INFO] Apmeklējumu ieraksti saglabāti! (/" + html_file + ")")
 
+# Save all attendance records corresponding to specific lesson ID to a HTML table. Save the file.
 def print_html_attendance_by_lesson_id(attendance_info, html_save_loc, lesson_id):
     current_date_time = datetime.datetime.now()
 
