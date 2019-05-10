@@ -1,5 +1,5 @@
 # SATS
-*Student Attendance Tracking System*
+*Student Attendance Tracking System - Software made as a part of a Bachelor's thesis.*
 
 ## About .py scripts
 Script (:heavy_exclamation_mark: - main module) | Function | Status
@@ -12,5 +12,6 @@ sats_**student_registration.py**| Takes webcam stream, identifies students and l
 sats_**auditorium_lesson_info.py**| Retreives info about what lessons are happening in the selected auditorium in the current day. | **Working**
 sats_**manual_attendance.py**| Allows to enter attendance data manually. Currently password **is not protected** in any way. | **Working**
 sats_**get_student_attendance.py**| Allows to get information about specific students attendance data, specific lesson's attendance data or all attendance data from MySQL database. | **Working**
+**dataset_fill_images.py**| Allows easier way for filling MySQL database with student image references. | **Working**
 
-**Last update on 14.04.19.*
+**Last update on 10.05.19.*
