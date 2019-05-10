@@ -17,7 +17,7 @@ def encode_faces(dataset_dir = "dataset", encodings_file = "encodings.pickle", d
     # Loop over all the found dataset images, get their associated student ID numbers, get face locations and encodings.
     for (i, imagePath) in enumerate(imagePaths):
         # Getting student ID from the image path.
-        print("[MĒRĪJUMU IEGUVE] Apstrādā bildi {}/{} ar apliecības numuru '{}'".format(i + 1, len(imagePaths), imagePath.split(os.path.sep)[-2]))
+        print("[MĒRĪJUMU IEGUVE] Apstrādā attēlu {}/{} ar apliecības numuru '{}'".format(i + 1, len(imagePaths), imagePath.split(os.path.sep)[-2]))
         student_id = imagePath.split(os.path.sep)[-2]
 
         # Load the input image and convert it from BGR color space RGB color space for dlib.
