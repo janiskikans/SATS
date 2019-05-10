@@ -6,4 +6,5 @@ dataset/*
 config/*
 !config/config_file_create.py
 !config/dev_settings_local.ini
-test_images/
+unknown_faces/*
+test_scripts/
