@@ -60,13 +60,15 @@ def register_student(student_id, auditorium, lesson_id, parser):
     mydb.close()
 
 # Main function that runs automatic student identification and registration.
-def recognition_cam(dev_settings_loc, encodings_file = "encodings.pickle", display = 1, detection_method = "hog", output = "", auditorium = "Not specified", webcam_select = 0):
+def recognition_cam(dev_settings_loc, encodings_file = "encodings.pickle", detection_method = "hog", output = "", auditorium = "Not specified", webcam_select = 0):
     # Config file import.
     parser = ConfigParser()
     parser.read(dev_settings_loc)
     # Load the setting parameters for unknown face image saving.
     unknow_face_save = parser.get('sats_setting_vars', 'unknown_face_save')
     unknown_face_save_loc = parser.get('sats_setting_vars', 'unknown_face_save_loc')
+    recognition_tolerance = parser.getfloat('sats_setting_vars', 'recognition_tolerance_level')
+    visualize_recognition = parser.getint('sats_setting_vars', 'visualize_recognition')
 
     print("\n[INFO] Ielādē studentu informāciju...")
 
@@ -107,7 +109,7 @@ def recognition_cam(dev_settings_loc, encodings_file = "encodings.pickle", displ
                 # While going through found faces compare them to the known encodings.
                 for encoding in encodings:
                     # Compare recognized faces in the webcam stream to the known student encodings.
-                    matches = face_recognition.compare_faces(data["encodings"], encoding)
+                    matches = face_recognition.compare_faces(data["encodings"], encoding, recognition_tolerance)
                     # Get the face encoding distances for the recognized face.
                     face_distances = face_recognition.face_distance(data["encodings"], encoding)
                     # Student ID number.
@@ -201,7 +203,7 @@ def recognition_cam(dev_settings_loc, encodings_file = "encodings.pickle", displ
                     writer.write(frame)
 
                 # Visualize identifaction process in a OpenCV window. Only if option is enabled.
-                if display > 0:
+                if visualize_recognition > 0:
                     cv2.imshow("SATS | Identifikacijas procesa vizualizacija", frame)
                     key = cv2.waitKey(1) & 0xFF
 

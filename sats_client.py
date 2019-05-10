@@ -41,7 +41,7 @@ while loop:
             else:
                 print("[KĻŪDA] Nepareiza kameras izvēle!")
 
-        recognition_cam(config_file_loc, encodings_file = "encodings.pickle", display = 0, detection_method = "hog", auditorium = auditorium_input, webcam_select = webcam_input)
+        recognition_cam(config_file_loc, encodings_file = "encodings.pickle", detection_method = "hog", auditorium = auditorium_input, webcam_select = webcam_input)
     elif choice == 3:
         # Call script to enter attendance data manually.
         sats_manual_attendance.manual_attendance(config_file_loc)

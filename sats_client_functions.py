@@ -39,7 +39,8 @@ def print_used_settings(config_file_loc):
     ["MySQL adrese", parser.get('db', 'db_host')], ["MySQL lietotājs", parser.get('db', 'db_user')], ["MySQL parole", parser.get('db', 'db_passwd')],\
     ["MySQL datubāze", parser.get('db', 'db_database')], ["unknow_face_save", parser.get('sats_setting_vars', 'unknown_face_save')],\
     ["unknow_face_save_loc", parser.get('sats_setting_vars', 'unknown_face_save_loc')], ["html_save_loc", parser.get('sats_setting_vars', 'html_save_loc')],\
-    ["html_report_save_toggle", parser.get('sats_setting_vars', 'html_report_save_toggle')]]
+    ["html_report_save_toggle", parser.get('sats_setting_vars', 'html_report_save_toggle')], ["recognition_tolerance_level", parser.getfloat('sats_setting_vars', 'recognition_tolerance_level')],\
+    ["visualize_recognition", parser.getint('sats_setting_vars', 'visualize_recognition')]]
 
     print("\n[INFO] SATS izmantotie uzstādījumi ({0}):".format(config_file_loc))
     print(tabulate(data, headers = ["Uzstādījuma nosaukums", "Uzstādījuma vērtība"], tablefmt = "psql", colalign = ["left", "center"]))
