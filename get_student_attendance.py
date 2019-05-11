@@ -4,6 +4,7 @@ import datetime
 from tabulate import tabulate
 import HTML
 import os
+import io
 
 # Gets all attendance information from studentu_uzskaite table.
 def get_all_attendance_data(config_file_loc, html_save_loc, html_report_save_toggle):
@@ -149,7 +150,7 @@ def print_html_all_attendance(attendance_info, html_save_loc):
     os.chdir(html_save_loc)
 
     html_file = ("all_attendance_report_" + current_date_time.strftime('%Y%m%d_%H%M%S') + ".html")
-    f = open(html_file, 'w')
+    f = open(html_file, 'w', encoding = "utf-8")
 
     htmlcode = HTML.table(attendance_info, header_row = ["ID", "Vārds", "Uzvārds", "Apliecības nr.", "Reg. laiks", "Telpas nr.", "Kursa nosauk.", "Nodarbības ID", "Pasn. vārds", "Pasn. uzvārds"])
     
@@ -173,7 +174,7 @@ def print_html_attendance_by_student(attendance_info, html_save_loc, student_id)
     os.chdir(html_save_loc)
 
     html_file = ("attendance_by_student_report_" + student_id + "_" + current_date_time.strftime('%Y%m%d_%H%M%S') + ".html")
-    f = open(html_file, 'w')
+    f = open(html_file, 'w', encoding = "utf-8")
 
     htmlcode = HTML.table(attendance_info, header_row = ["ID", "Reg. laiks", "Telpas nr.", "Kursa nosauk.", "Nodarbības ID", "Pasn. vārds", "Pasn. uzvārds"])
     
@@ -197,7 +198,7 @@ def print_html_attendance_by_lesson_id(attendance_info, html_save_loc, lesson_id
     os.chdir(html_save_loc)
 
     html_file = ("attendance_by_lesson_report_" + lesson_id + "_" + current_date_time.strftime('%Y%m%d_%H%M%S') + ".html")
-    f = open(html_file, 'w')
+    f = open(html_file, 'w', encoding = "utf-8")
 
     htmlcode = HTML.table(attendance_info, header_row = ["ID", "Vārds", "Uzvārds", "Apliecības nr.", "Reg. laiks", "Telpas nr.", "Kursa nosauk.", "Pasn. vārds", "Pasn. uzvārds"])
     
