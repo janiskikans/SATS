@@ -8,3 +8,4 @@ config/*
 !config/dev_settings_local.ini
 unknown_faces/*
 test_scripts/
+html_attendance_reports/*
